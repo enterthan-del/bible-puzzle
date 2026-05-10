@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성경 장제목 퍼즐 게임</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>성경 장제목 퍼즐</h1>
+            <div class="controls">
+                <select id="testament-select">
+                    <option value="OT">구약</option>
+                    <option value="NT">신약</option>
+                </select>
+                <select id="book-select">
+                </select>
+                <select id="range-select">
+                </select>
+                <button id="start-btn">게임 시작</button>
+                <button id="hint-btn" style="background-color: #f39c12; margin-top: 0.5rem; color: #fff;">💡 힌트 보기</button>
+                <div class="stats" style="text-align: center; margin: 0.5rem 0; padding: 1rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: #f8f9fa; display: flex; flex-direction: column; gap: 0.6rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="font-size: 1.05rem; padding-bottom: 0.2rem;">진행률: <span id="progress-text" style="font-weight: bold; color: #333;">0 / 0</span></div>
+                    <hr style="border: none; border-top: 1px dashed #d1d5db; margin: 0;">
+                    <div style="padding-bottom: 0.2rem;">진행 시간: <span id="timer-text" style="font-family: monospace; font-size: 1.4em; color: var(--primary-color); font-weight: bold;">00:00</span></div>
+                    <hr style="border: none; border-top: 1px dashed #d1d5db; margin: 0;">
+                    <div style="font-size: 0.9em; color: #7f8c8d; padding-bottom: 0.2rem;">최고 기록: <span id="best-record-text">없음</span></div>
+                    <hr style="border: none; border-top: 1px dashed #d1d5db; margin: 0;">
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem; color: #444; margin-top: 0.2rem;">
+                        <input type="checkbox" id="tts-toggle" checked style="accent-color: var(--primary-color); transform: scale(1.2);">
+                        🔊 음성 읽어주기 켜기
+                    </label>
+                </div>
+                <button id="open-editor-btn" style="background-color: #27ae60;">데이터 입력기</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Drop Zones -->
+            <section class="puzzle-board" id="puzzle-board">
+                <!-- Drop slots will be generated here -->
+            </section>
+
+            <!-- Draggable Pieces -->
+            <section class="pieces-pool" id="pieces-pool">
+                <!-- Draggable pieces will be generated here -->
+            </section>
+        </main>
+        
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>축하합니다! 🎉</h2>
+                <p>선택한 범위의 장제목을 모두 맞추셨습니다.</p>
+                <div style="margin: 1.5rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <p style="font-size: 1.3rem; margin-bottom: 0;">완성 시간: <strong id="final-time" style="color: var(--primary-color); font-family: monospace;">00:00</strong></p>
+                    <p id="new-record-msg" style="color: var(--success-color); font-weight: bold; margin-top: 0.8rem; display: none; font-size: 1.1rem; animation: popIn 0.3s ease-out;">🏆 새로운 최고 기록입니다!</p>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="restart-btn">다시 하기</button>
+                    <button id="review-btn" style="background-color: #e74c3c; display: none;">📝 오답 노트</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Modal -->
+        <div id="review-modal" class="modal hidden">
+            <div class="modal-content" style="width: 90%; max-width: 500px; text-align: left;">
+                <h2 style="color: #e74c3c; margin-bottom: 1rem; font-size: 1.8rem;">📝 오답 노트</h2>
+                <p style="margin-bottom: 1rem; color: #555;">잘못된 위치에 놓았던 장 제목들입니다. 다시 복습해 보세요!</p>
+                <ul id="review-list" style="max-height: 300px; overflow-y: auto; list-style: none; padding: 0; margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: #fdfdfd;">
+                </ul>
+                <div style="text-align: right;">
+                    <button id="close-review-btn" style="background-color: #95a5a6;">닫기</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Editor Modal -->
+        <div id="editor-modal" class="modal hidden">
+            <div class="modal-content" style="width: 90%; max-width: 600px; text-align: left;">
+                <h2 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem;">데이터 입력기</h2>
+                <p style="margin-bottom: 1rem; color: #555; font-size: 0.95rem;">성경을 선택하고 각 줄에 장 제목을 입력하세요.</p>
+                <div class="controls" style="flex-direction: row; margin-bottom: 1rem;">
+                    <select id="edit-testament-select">
+                        <option value="OT">구약</option>
+                        <option value="NT">신약</option>
+                    </select>
+                    <select id="edit-book-select" style="flex: 1;"></select>
+                </div>
+                <textarea id="edit-textarea" rows="15" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 4px; resize: vertical; line-height: 1.5; font-family: inherit;" placeholder="장 제목과 요약 내용을 '|' 기호로 구분해서 입력하세요.&#10;(요약 내용이 없으면 장 제목만 입력해도 됩니다)&#10;&#10;예:&#10;천지 창조 | 태초에 하나님이 천지를 창조하시니라&#10;에덴 동산 | 아담과 하와가 에덴 동산에서 살게 됨&#10;죄의 기원과 인류의 타락"></textarea>
+                <div style="margin-top: 1rem; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button id="close-editor-btn" style="background-color: #95a5a6;">닫기</button>
+                    <button id="copy-data-btn" style="background-color: var(--success-color);">전체 코드 복사</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
