@@ -383,68 +383,65 @@ main {
     }
 
     h1 {
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.6rem;
         text-align: center;
     }
 
-    /* Controls: 구약(고정폭) + 성경선택(유연) / 장선택 / 버튼3개 / 통계 */
+    /* Controls: 3열 2행 구조 */
     .controls {
         display: grid !important;
-        grid-template-columns: minmax(70px, 90px) 1fr minmax(60px, 80px);
+        grid-template-columns: 1fr 1fr 1fr;  /* 3등분 */
         gap: 0.5rem;
         width: 100%;
         margin-bottom: 0;
     }
 
-    /* 행 1: 구약|성경 선택 */
-    #testament-select { grid-column: 1; font-size: 0.9rem; padding: 0.5rem 0.3rem; }
-    #book-select      { grid-column: 2 / 4; padding: 0.5rem 0.6rem; }
+    /* 행 1: 구약/신약 | 성경 선택 | 장 범위 */
+    #testament-select { grid-column: 1; font-size: 0.88rem; padding: 0.5rem 0.3rem; text-align: center; }
+    #book-select      { grid-column: 2; padding: 0.5rem 0.4rem; }
+    #range-select     { grid-column: 3; padding: 0.5rem 0.4rem; }
 
-    /* 행 2: 장 선택 (세 칸 전부) */
-    #range-select { grid-column: 1 / 4; padding: 0.5rem 0.6rem; }
+    /* 행 2: 게임 시작 | 힌트 | 에디터 */
+    #start-btn       { grid-column: 1; padding: 0.55rem; }
+    #hint-btn        { grid-column: 2; padding: 0.55rem; background-color: #f39c12; }
+    #open-editor-btn { grid-column: 3; padding: 0.55rem; background-color: #27ae60; font-size: 0.85rem; }
 
-    /* 행 3: 게임시작(2칸) | 힌트(1칸) | 에디터(1칸) */
-    #start-btn      { grid-column: 1 / 3; padding: 0.55rem; }
-    #hint-btn       { grid-column: 3;     padding: 0.55rem; background-color: #f39c12; }
-    #open-editor-btn { grid-column: 1 / 4; padding: 0.45rem; background-color: #27ae60;
-                        font-size: 0.85rem; }
-
-    /* 행 4: 통계 바 - 구분선 있는 별도 영역 */
+    /* 행 3: 통계 바 (그대로 유지) */
     .stats {
         grid-column: 1 / 4;
         margin-top: 0.4rem;
-        padding: 0.6rem 1rem;
+        padding: 0.5rem 0.8rem;
         border: none;
         border-top: 2px solid #e8eaf0;
         border-radius: 8px;
         background: linear-gradient(135deg, #f0f4ff 0%, #fff 100%);
         justify-content: space-between;
-        gap: 0.6rem;
+        gap: 0.5rem;
     }
 
-    .stat-item { font-size: 0.88rem; }
+    .stat-item { font-size: 0.85rem; }
     #timer-text { font-size: 1rem; }
 
-    /* 퍼즐 판: 기본 minmax를 더 크게 유지해 빈공간 방지 */
+    /* 퍼즐 판: 헤더가 줄었으므로 조각 기본 크기를 키움 */
     .puzzle-board, .pieces-pool {
-        grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 110px), 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 130px), 1fr));
         padding: 1rem;
         gap: 0.8rem;
     }
 
-    /* Small Phone optimization */
+    /* Small Phone optimization (max 600px) */
     @media (max-width: 600px) {
-        .controls {
-            grid-template-columns: minmax(62px, 76px) 1fr minmax(56px, 70px);
-            gap: 0.4rem;
-        }
+        h1 { font-size: 1rem; margin-bottom: 0.4rem; }
 
-        #testament-select { font-size: 0.82rem; padding: 0.45rem 0.2rem; }
-        #open-editor-btn  { font-size: 0.78rem; }
-        
+        .controls { gap: 0.35rem; }
+
+        #testament-select { font-size: 0.78rem; padding: 0.42rem 0.15rem; }
+        #book-select, #range-select { padding: 0.42rem 0.3rem; font-size: 0.82rem; }
+        #start-btn, #hint-btn, #open-editor-btn { padding: 0.48rem 0.2rem; font-size: 0.82rem; }
+
         .puzzle-board, .pieces-pool {
-            grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 80px), 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 90px), 1fr));
             padding: 0.6rem;
             gap: 0.5rem;
         }
