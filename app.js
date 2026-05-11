@@ -7,6 +7,7 @@ let timerInterval = null;
 let elapsedTime = 0;
 let currentBookRangeKey = "";
 let wrongAttempts = new Set();
+let currentUtterance = null; // Prevent garbage collection on iOS
 
 const puzzleBoard = document.getElementById('puzzle-board');
 const piecesPool = document.getElementById('pieces-pool');
@@ -27,14 +28,34 @@ const hintBtn = document.getElementById('hint-btn');
 const reviewBtn = document.getElementById('review-btn');
 const reviewModal = document.getElementById('review-modal');
 const closeReviewBtn = document.getElementById('close-review-btn');
+const closeSuccessBtn = document.getElementById('close-success-btn');
 const reviewList = document.getElementById('review-list');
 
-startBtn.addEventListener('click', initGame);
+closeSuccessBtn.addEventListener('click', () => {
+    successModal.classList.add('hidden');
+});
 restartBtn.addEventListener('click', () => {
     successModal.classList.add('hidden');
     reviewModal.classList.add('hidden');
+    primeTTS(); // Unlock TTS for iOS
     initGame();
 });
+
+startBtn.addEventListener('click', () => {
+    primeTTS(); // Unlock TTS for iOS
+    initGame();
+});
+
+function primeTTS() {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const silent = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(silent);
+        if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+        }
+    }
+}
 
 hintBtn.addEventListener('click', () => {
     const remainingPieces = Array.from(piecesPool.children);
@@ -175,30 +196,32 @@ function checkAndSaveBestRecord() {
 
 function adjustSizes(total) {
     const root = document.documentElement;
+    const isMobile = window.innerWidth <= 768;
+    
     if (total <= 10) {
-        root.style.setProperty('--item-min-width', '140px');
-        root.style.setProperty('--item-height', '140px');
-        root.style.setProperty('--piece-font-size', '1.1rem');
-        root.style.setProperty('--chapter-font-size', '2.5rem');
-        root.style.setProperty('--piece-padding', '1rem');
+        root.style.setProperty('--item-min-width', isMobile ? '100px' : '140px');
+        root.style.setProperty('--item-height', isMobile ? '100px' : '140px');
+        root.style.setProperty('--piece-font-size', isMobile ? '0.9rem' : '1.1rem');
+        root.style.setProperty('--chapter-font-size', isMobile ? '2rem' : '2.5rem');
+        root.style.setProperty('--piece-padding', isMobile ? '0.6rem' : '1rem');
     } else if (total <= 20) {
-        root.style.setProperty('--item-min-width', '110px');
-        root.style.setProperty('--item-height', '110px');
-        root.style.setProperty('--piece-font-size', '1rem');
-        root.style.setProperty('--chapter-font-size', '2rem');
-        root.style.setProperty('--piece-padding', '0.8rem');
+        root.style.setProperty('--item-min-width', isMobile ? '85px' : '110px');
+        root.style.setProperty('--item-height', isMobile ? '85px' : '110px');
+        root.style.setProperty('--piece-font-size', isMobile ? '0.8rem' : '1rem');
+        root.style.setProperty('--chapter-font-size', isMobile ? '1.5rem' : '2rem');
+        root.style.setProperty('--piece-padding', isMobile ? '0.5rem' : '0.8rem');
     } else if (total <= 30) {
-        root.style.setProperty('--item-min-width', '90px');
-        root.style.setProperty('--item-height', '90px');
-        root.style.setProperty('--piece-font-size', '0.85rem');
-        root.style.setProperty('--chapter-font-size', '1.5rem');
-        root.style.setProperty('--piece-padding', '0.6rem');
+        root.style.setProperty('--item-min-width', isMobile ? '75px' : '90px');
+        root.style.setProperty('--item-height', isMobile ? '75px' : '90px');
+        root.style.setProperty('--piece-font-size', isMobile ? '0.75rem' : '0.85rem');
+        root.style.setProperty('--chapter-font-size', isMobile ? '1.2rem' : '1.5rem');
+        root.style.setProperty('--piece-padding', isMobile ? '0.4rem' : '0.6rem');
     } else {
-        root.style.setProperty('--item-min-width', '75px');
-        root.style.setProperty('--item-height', '75px');
-        root.style.setProperty('--piece-font-size', '0.7rem');
-        root.style.setProperty('--chapter-font-size', '1.2rem');
-        root.style.setProperty('--piece-padding', '0.4rem');
+        root.style.setProperty('--item-min-width', isMobile ? '65px' : '75px');
+        root.style.setProperty('--item-height', isMobile ? '65px' : '75px');
+        root.style.setProperty('--piece-font-size', isMobile ? '0.65rem' : '0.7rem');
+        root.style.setProperty('--chapter-font-size', isMobile ? '1rem' : '1.2rem');
+        root.style.setProperty('--piece-padding', isMobile ? '0.3rem' : '0.4rem');
     }
 }
 
@@ -216,7 +239,17 @@ function updateProgress() {
         
         setTimeout(() => {
             successModal.classList.remove('hidden');
+            resetModalPosition(successModal);
         }, 500);
+    }
+}
+
+function resetModalPosition(modal) {
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+        content.style.left = '';
+        content.style.top = '';
+        content.style.transform = '';
     }
 }
 
@@ -447,10 +480,18 @@ function playSuccessSound() {
 function speakChapterTitle(titleText) {
     if (ttsToggle && ttsToggle.checked && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(titleText);
-        utterance.lang = 'ko-KR';
-        utterance.rate = 1.0;
-        window.speechSynthesis.speak(utterance);
+        
+        // Use global variable to prevent garbage collection on some browsers
+        currentUtterance = new SpeechSynthesisUtterance(titleText);
+        currentUtterance.lang = 'ko-KR';
+        currentUtterance.rate = 1.0;
+        
+        // Some iOS versions require resume()
+        if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+        }
+        
+        window.speechSynthesis.speak(currentUtterance);
     }
 }
 
@@ -613,3 +654,43 @@ copyDataBtn.addEventListener('click', () => {
         console.error("Clipboard error:", err);
     });
 });
+
+// --- Draggable Modal Logic ---
+function makeDraggable(modalId) {
+    const modal = document.getElementById(modalId);
+    const content = modal.querySelector('.modal-content');
+    const header = content.querySelector('h2'); // Drag by the title
+    
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        
+        // Get current position
+        const rect = content.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        
+        content.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const x = e.clientX - offsetX;
+        const y = e.clientY - offsetY;
+        
+        content.style.left = x + 'px';
+        content.style.top = y + 'px';
+        content.style.transform = 'none'; // Disable the centering transform while dragging
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        content.style.cursor = '';
+    });
+}
+
+// Apply draggable logic to modals
+makeDraggable('success-modal');
