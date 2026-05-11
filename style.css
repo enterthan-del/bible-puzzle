@@ -34,19 +34,20 @@ body {
 header {
     text-align: left;
     margin-bottom: 0;
-    min-width: 250px;
+    min-width: 280px;
     position: sticky;
     top: 2rem;
     background: #ffffff;
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 h1 {
     color: var(--primary-color);
     margin-bottom: 1.5rem;
     font-size: 1.8rem;
+    font-weight: 800;
 }
 
 .controls {
@@ -60,10 +61,26 @@ select, button {
     padding: 0.6rem 1rem;
     font-size: 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
     outline: none;
     font-family: inherit;
+    transition: all 0.2s;
 }
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #357abd;
+}
+
+#hint-btn { background-color: #f39c12; }
+#open-editor-btn { background-color: #27ae60; }
 
 .stats {
     display: flex;
@@ -71,11 +88,11 @@ select, button {
     justify-content: center;
     align-items: center;
     background-color: #f8f9fa;
-    padding: 0.5rem;
-    border-radius: 8px;
+    padding: 0.8rem;
+    border-radius: 10px;
     border: 1px solid var(--border-color);
-    gap: 0.8rem;
-    font-size: 0.85rem;
+    gap: 1rem;
+    font-size: 0.95rem;
     width: 100%;
 }
 
@@ -84,11 +101,11 @@ select, button {
     white-space: nowrap;
 }
 
-
 #timer-text {
     color: var(--primary-color);
     font-family: monospace;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 800;
 }
 
 .stat-item.record {
@@ -100,11 +117,10 @@ select, button {
 .tts-group label {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.4rem;
     cursor: pointer;
     font-size: 0.9rem;
 }
-
 
 /* Board and Pieces */
 main {
@@ -120,9 +136,9 @@ main {
     gap: 1rem;
     padding: 1.5rem;
     background: #e9ecef;
-    border-radius: 8px;
+    border-radius: 12px;
     min-height: 200px;
-    justify-content: center; /* Center items if they don't fill the row */
+    justify-content: center;
 }
 
 .pieces-pool {
@@ -130,28 +146,16 @@ main {
     border: 2px dashed #a4b0be;
 }
 
-/* Slots */
 .slot {
     background-color: var(--slot-bg);
     border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 10px;
     height: var(--item-height, 140px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    transition: all 0.3s ease;
-}
-
-.slot.drag-over {
-    background-color: #d1ecf1;
-    border-color: var(--primary-color);
-}
-
-.slot.filled {
-    border-color: var(--success-color);
-    background-color: #e8f8f5;
 }
 
 .chapter-number {
@@ -163,27 +167,24 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: all 0.3s ease;
 }
 
 .slot.filled .chapter-number {
     z-index: 3;
     font-size: 0.85rem;
-    top: 4px;
-    left: 4px;
+    top: 6px;
+    left: 6px;
     transform: none;
     color: var(--primary-color);
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 2px 4px;
+    padding: 2px 5px;
     border-radius: 4px;
-    line-height: 1;
 }
 
-/* Pieces */
 .piece {
     background-color: var(--piece-bg);
     border: 2px solid var(--primary-color);
-    border-radius: 8px;
+    border-radius: 10px;
     height: var(--item-height, 140px);
     display: flex;
     align-items: center;
@@ -194,311 +195,136 @@ main {
     box-shadow: var(--piece-shadow);
     font-weight: 700;
     font-size: var(--piece-font-size, 1.1rem);
-    user-select: none;
-    touch-action: none; /* Prevent browser scrolling while dragging */
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    z-index: 2;
+    touch-action: none;
     word-break: keep-all;
     overflow-wrap: break-word;
-    min-width: 0; /* Prevent content from pushing grid width */
     width: 100%;
     color: #2c3e50;
 }
 
 .piece:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.piece:active {
-    cursor: grabbing;
-}
-
-.piece.dragging {
-    opacity: 0.5;
-}
-
-/* Animating piece inside slot */
-.slot .piece {
-    cursor: default;
-    border-color: var(--success-color);
-    box-shadow: none;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    border-radius: 6px;
-    animation: popIn 0.3s ease-out forwards;
-}
-
-.slot .piece:hover {
-    transform: none;
-}
-
-@keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes flashSuccess {
-    0% { background-color: var(--slot-bg); }
-    50% { background-color: #a3e4d7; }
-    100% { background-color: #e8f8f5; }
-}
-
-.flash {
-    animation: flashSuccess 0.5s ease-out forwards;
-}
-
-/* Modal */
-.hidden {
-    display: none !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
 }
 
 .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 }
 
-.modal-content h2 {
-    color: var(--success-color);
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    cursor: move; /* Indicate that the window can be moved */
-}
-
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #95a5a6;
-    cursor: pointer;
-    transition: color 0.2s;
-    line-height: 1;
-}
-
-.close-btn:hover {
-    color: #333;
-}
-
 .modal-content {
-    position: relative;
     background: white;
     padding: 3rem;
-    border-radius: 8px;
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    animation: slideDown 0.3s ease-out;
-}
-
-.modal-content p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-/* Tooltip */
-.tooltip {
-    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    max-width: 90%;
 }
 
 .tooltip::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 110%;
+    bottom: 115%;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background-color: rgba(44, 62, 80, 0.95);
+    background-color: rgba(44, 62, 80, 0.98);
     color: #fff;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    white-space: pre-wrap; /* allow wrapping if text is long */
-    max-width: 250px;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    max-width: 280px;
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease-out;
     z-index: 1000;
-    pointer-events: none;
-    font-weight: normal;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
     text-align: center;
-    line-height: 1.4;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-.tooltip::before {
-    content: '';
-    position: absolute;
-    bottom: 110%;
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    border-width: 6px;
-    border-style: solid;
-    border-color: rgba(44, 62, 80, 0.95) transparent transparent transparent;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease-out;
-    z-index: 1000;
-    pointer-events: none;
-    margin-bottom: -11px;
-}
-
-.tooltip:hover::after,
-.tooltip:hover::before {
+.tooltip:hover::after {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
 }
 
-/* Hint Animation */
-@keyframes hintFlash {
-    0%, 100% { box-shadow: 0 0 0 0 transparent; border-color: var(--border-color); }
-    50% { box-shadow: 0 0 15px 5px rgba(243, 156, 18, 0.8); border-color: #f39c12; }
-}
-
-.hint-flash {
-    animation: hintFlash 0.5s ease-in-out 4;
-    position: relative;
-    z-index: 10;
-}
-
-/* Review List */
-#review-list li {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #eef0f2;
-    display: flex;
-    align-items: center;
-}
-
-#review-list li:last-child {
-    border-bottom: none;
-}
-
-#review-list li .chapter {
-    font-weight: bold;
-    color: #e74c3c;
-    margin-right: 1rem;
-    min-width: 45px;
-}
-
-#review-list li .title {
-    flex: 1;
-    color: #2c3e50;
-    font-size: 1.05rem;
-}
 /* --- Mobile/Tablet Optimization --- */
 @media (max-width: 1024px) {
     .container {
         flex-direction: column;
         padding: 1rem;
         gap: 1.5rem;
-        align-items: stretch; /* Ensure children fill the width */
-    }
-
-    main {
-        width: 100%;
+        align-items: stretch;
     }
 
     header {
         min-width: 100%;
         position: static;
-        padding: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        padding: 1.2rem;
+        border-radius: 0 0 15px 15px;
     }
 
     h1 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
         text-align: center;
     }
 
-    header .controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        width: 100%;
-        max-width: 600px;
-        gap: 0.3rem;
-        justify-content: center;
-    }
-
-    #testament-select { width: 65px; padding: 0.4rem 0.2rem; }
-    #book-select { flex: 1; min-width: 100px; padding: 0.4rem 0.5rem; }
-    #range-select { width: 100%; padding: 0.4rem 0.5rem; }
-    
-    #start-btn { flex: 2; min-width: 120px; padding: 0.5rem; }
-    #hint-btn { flex: 1; min-width: 60px; padding: 0.5rem; background-color: #f39c12; }
-    #open-editor-btn { flex: 1; min-width: 60px; padding: 0.5rem; background-color: #27ae60; font-size: 0.85rem; }
-
-    .stats {
-        padding: 0.3rem 0.5rem;
-        gap: 0.5rem;
-        border-radius: 4px;
-    }
-
-    .stat-item {
-        font-size: 0.8rem;
-    }
-
-    .tts-group label {
-        font-size: 0.8rem;
-    }
-
-
-
-    .puzzle-board, .pieces-pool {
-        /* Use auto-fill to maintain consistent piece size */
-        grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 70px), 1fr));
-        padding: 0.8rem;
+    .controls {
+        display: grid !important;
+        grid-template-columns: 100px 1fr 1fr; /* 3 columns grid */
         gap: 0.6rem;
         width: 100%;
-        justify-content: center; /* Center the grid items */
+        margin-bottom: 0.5rem;
+    }
+
+    #testament-select { grid-column: 1; }
+    #book-select { grid-column: 2 / 4; }
+    #range-select { grid-column: 1 / 4; }
+    
+    #start-btn { grid-column: 1 / 3; }
+    #hint-btn { grid-column: 3; }
+    #open-editor-btn { grid-column: 1 / 4; margin-top: 0.2rem; }
+
+    .stats {
+        grid-column: 1 / 4;
+        margin-top: 0.8rem;
+        padding: 0.8rem;
+        border: 2px solid var(--primary-color);
+        background-color: #fff;
+        justify-content: space-around;
+    }
+
+    .stat-item { font-size: 0.9rem; }
+
+    .puzzle-board, .pieces-pool {
+        grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 100px), 1fr));
+        padding: 1rem;
+        gap: 0.8rem;
     }
 
     /* Small Phone optimization */
     @media (max-width: 600px) {
+        .controls {
+            grid-template-columns: 85px 1fr 1fr;
+        }
+        
         .puzzle-board, .pieces-pool {
-            /* Force more columns on phones by reducing min-width */
-            grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 60px), 1fr));
-            padding: 0.5rem;
-            gap: 0.4rem;
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 80px), 1fr));
         }
 
         .piece {
-            word-break: normal;
-            overflow-wrap: anywhere;
-            padding: 0.1rem !important;
+            padding: 0.2rem !important;
         }
     }
 
     .modal-content {
-        max-height: 95vh;
-        overflow-y: auto;
+        padding: 2rem;
         width: 95%;
-        padding: 1.5rem;
-    }
-
-    #edit-textarea {
-        rows: 10; /* Reduce rows on mobile */
-    }
-        width: 95%;
-        padding: 2rem 1.5rem;
-    }
-
-    .modal-content h2 {
-        font-size: 1.8rem;
     }
 }

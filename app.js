@@ -207,29 +207,29 @@ function adjustSizes(total) {
     let minWidth, height, fontSize, chapterSize, padding;
     
     if (total <= 10) {
-        minWidth = isPhone ? '65px' : (isTablet ? '80px' : '140px');
-        height = isPhone ? '75px' : (isTablet ? '80px' : '140px');
-        fontSize = isPhone ? '0.75rem' : (isTablet ? '0.85rem' : '1.1rem');
-        chapterSize = isPhone ? '1.7rem' : (isTablet ? '1.9rem' : '2.5rem');
-        padding = isPhone ? '0.3rem' : (isTablet ? '0.4rem' : '1rem');
+        minWidth = isPhone ? '80px' : (isTablet ? '120px' : '140px');
+        height = isPhone ? '90px' : (isTablet ? '120px' : '140px');
+        fontSize = isPhone ? '0.85rem' : (isTablet ? '1.05rem' : '1.1rem');
+        chapterSize = isPhone ? '2rem' : (isTablet ? '2.3rem' : '2.5rem');
+        padding = isPhone ? '0.5rem' : (isTablet ? '0.8rem' : '1rem');
     } else if (total <= 20) {
-        minWidth = isPhone ? '60px' : (isTablet ? '75px' : '110px');
-        height = isPhone ? '70px' : (isTablet ? '75px' : '110px');
-        fontSize = isPhone ? '0.7rem' : (isTablet ? '0.75rem' : '1rem');
-        chapterSize = isPhone ? '1.4rem' : (isTablet ? '1.5rem' : '2rem');
-        padding = isPhone ? '0.2rem' : (isTablet ? '0.3rem' : '0.8rem');
+        minWidth = isPhone ? '75px' : (isTablet ? '100px' : '110px');
+        height = isPhone ? '80px' : (isTablet ? '100px' : '110px');
+        fontSize = isPhone ? '0.75rem' : (isTablet ? '0.9rem' : '1rem');
+        chapterSize = isPhone ? '1.6rem' : (isTablet ? '1.9rem' : '2rem');
+        padding = isPhone ? '0.3rem' : (isTablet ? '0.5rem' : '0.8rem');
     } else if (total <= 30) {
-        minWidth = isPhone ? '55px' : (isTablet ? '65px' : '95px');
-        height = isPhone ? '65px' : (isTablet ? '65px' : '95px');
-        fontSize = isPhone ? '0.65rem' : (isTablet ? '0.7rem' : '0.9rem');
-        chapterSize = isPhone ? '1.1rem' : (isTablet ? '1.2rem' : '1.6rem');
-        padding = isPhone ? '0.15rem' : (isTablet ? '0.25rem' : '0.6rem');
+        minWidth = isPhone ? '70px' : (isTablet ? '85px' : '95px');
+        height = isPhone ? '75px' : (isTablet ? '85px' : '95px');
+        fontSize = isPhone ? '0.7rem' : (isTablet ? '0.8rem' : '0.9rem');
+        chapterSize = isPhone ? '1.3rem' : (isTablet ? '1.5rem' : '1.6rem');
+        padding = isPhone ? '0.2rem' : (isTablet ? '0.4rem' : '0.6rem');
     } else {
-        minWidth = isPhone ? '50px' : (isTablet ? '55px' : '75px');
-        height = isPhone ? '55px' : (isTablet ? '55px' : '75px');
-        fontSize = isPhone ? '0.55rem' : (isTablet ? '0.6rem' : '0.7rem');
-        chapterSize = isPhone ? '0.8rem' : (isTablet ? '0.9rem' : '1.2rem');
-        padding = isPhone ? '0.1rem' : (isTablet ? '0.1rem' : '0.4rem');
+        minWidth = isPhone ? '65px' : (isTablet ? '75px' : '80px');
+        height = isPhone ? '70px' : (isTablet ? '75px' : '80px');
+        fontSize = isPhone ? '0.6rem' : (isTablet ? '0.7rem' : '0.75rem');
+        chapterSize = isPhone ? '1rem' : (isTablet ? '1.2rem' : '1.3rem');
+        padding = isPhone ? '0.15rem' : (isTablet ? '0.2rem' : '0.4rem');
     }
     
     root.style.setProperty('--item-min-width', minWidth);
