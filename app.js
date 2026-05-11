@@ -122,8 +122,10 @@ function initGame() {
         let summary = "";
         if (t && t.includes('|')) {
             const parts = t.split('|');
-            title = parts[0].trim();
+            title = parts[0].trim().replace(/\u00a0/g, ' ');
             summary = parts.slice(1).join('|').trim();
+        } else if (t) {
+            title = t.replace(/\u00a0/g, ' ');
         }
         return {
             chapter: startOffset + index,
@@ -197,7 +199,7 @@ function checkAndSaveBestRecord() {
 
 function adjustSizes(total) {
     const root = document.documentElement;
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 1024;
     
     if (total <= 10) {
         root.style.setProperty('--item-min-width', isMobile ? '70px' : '140px');
