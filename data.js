@@ -1,4 +1,4 @@
-// window.bibleData = {
+window.bibleData = {
   books: [
     { id: "genesis", name: "창세기", testament: "OT",
       titles: [
