@@ -122,10 +122,11 @@ function initGame() {
         let summary = "";
         if (t && t.includes('|')) {
             const parts = t.split('|');
-            title = parts[0].trim().replace(/\u00a0/g, ' ');
+            // Replace NBSP with space and add zero-width space before '(' to allow wrapping
+            title = parts[0].trim().replace(/\u00a0/g, ' ').replace(/\(/g, '\u200B(');
             summary = parts.slice(1).join('|').trim();
         } else if (t) {
-            title = t.replace(/\u00a0/g, ' ');
+            title = t.replace(/\u00a0/g, ' ').replace(/\(/g, '\u200B(');
         }
         return {
             chapter: startOffset + index,
@@ -199,33 +200,43 @@ function checkAndSaveBestRecord() {
 
 function adjustSizes(total) {
     const root = document.documentElement;
-    const isMobile = window.innerWidth <= 1024;
+    const width = window.innerWidth;
+    const isPhone = width <= 600;
+    const isTablet = width > 600 && width <= 1024;
+    
+    let minWidth, height, fontSize, chapterSize, padding;
     
     if (total <= 10) {
-        root.style.setProperty('--item-min-width', isMobile ? '70px' : '140px');
-        root.style.setProperty('--item-height', isMobile ? '80px' : '140px');
-        root.style.setProperty('--piece-font-size', isMobile ? '0.8rem' : '1.1rem');
-        root.style.setProperty('--chapter-font-size', isMobile ? '1.8rem' : '2.5rem');
-        root.style.setProperty('--piece-padding', isMobile ? '0.4rem' : '1rem');
+        minWidth = isPhone ? '70px' : (isTablet ? '110px' : '140px');
+        height = isPhone ? '80px' : (isTablet ? '110px' : '140px');
+        fontSize = isPhone ? '0.8rem' : (isTablet ? '1rem' : '1.1rem');
+        chapterSize = isPhone ? '1.8rem' : (isTablet ? '2.2rem' : '2.5rem');
+        padding = isPhone ? '0.4rem' : (isTablet ? '0.8rem' : '1rem');
     } else if (total <= 20) {
-        root.style.setProperty('--item-min-width', isMobile ? '70px' : '110px');
-        root.style.setProperty('--item-height', isMobile ? '75px' : '110px');
-        root.style.setProperty('--piece-font-size', isMobile ? '0.75rem' : '1rem');
-        root.style.setProperty('--chapter-font-size', isMobile ? '1.5rem' : '2rem');
-        root.style.setProperty('--piece-padding', isMobile ? '0.3rem' : '0.8rem');
+        minWidth = isPhone ? '70px' : (isTablet ? '100px' : '110px');
+        height = isPhone ? '75px' : (isTablet ? '100px' : '110px');
+        fontSize = isPhone ? '0.75rem' : (isTablet ? '0.9rem' : '1rem');
+        chapterSize = isPhone ? '1.5rem' : (isTablet ? '1.8rem' : '2rem');
+        padding = isPhone ? '0.3rem' : (isTablet ? '0.6rem' : '0.8rem');
     } else if (total <= 30) {
-        root.style.setProperty('--item-min-width', isMobile ? '65px' : '90px');
-        root.style.setProperty('--item-height', isMobile ? '70px' : '90px');
-        root.style.setProperty('--piece-font-size', isMobile ? '0.7rem' : '0.85rem');
-        root.style.setProperty('--chapter-font-size', isMobile ? '1.2rem' : '1.5rem');
-        root.style.setProperty('--piece-padding', isMobile ? '0.2rem' : '0.6rem');
+        minWidth = isPhone ? '65px' : (isTablet ? '85px' : '95px');
+        height = isPhone ? '70px' : (isTablet ? '85px' : '95px');
+        fontSize = isPhone ? '0.7rem' : (isTablet ? '0.8rem' : '0.9rem');
+        chapterSize = isPhone ? '1.2rem' : (isTablet ? '1.4rem' : '1.6rem');
+        padding = isPhone ? '0.2rem' : (isTablet ? '0.4rem' : '0.6rem');
     } else {
-        root.style.setProperty('--item-min-width', isMobile ? '60px' : '75px');
-        root.style.setProperty('--item-height', isMobile ? '65px' : '75px');
-        root.style.setProperty('--piece-font-size', isMobile ? '0.6rem' : '0.7rem');
-        root.style.setProperty('--chapter-font-size', isMobile ? '1rem' : '1.2rem');
-        root.style.setProperty('--piece-padding', isMobile ? '0.1rem' : '0.4rem');
+        minWidth = isPhone ? '60px' : (isTablet ? '75px' : '80px');
+        height = isPhone ? '65px' : (isTablet ? '75px' : '80px');
+        fontSize = isPhone ? '0.6rem' : (isTablet ? '0.7rem' : '0.75rem');
+        chapterSize = isPhone ? '1rem' : (isTablet ? '1.2rem' : '1.3rem');
+        padding = isPhone ? '0.1rem' : (isTablet ? '0.2rem' : '0.4rem');
     }
+    
+    root.style.setProperty('--item-min-width', minWidth);
+    root.style.setProperty('--item-height', height);
+    root.style.setProperty('--piece-font-size', fontSize);
+    root.style.setProperty('--chapter-font-size', chapterSize);
+    root.style.setProperty('--piece-padding', padding);
 }
 
 function updateProgress() {

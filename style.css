@@ -175,8 +175,8 @@ main {
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     z-index: 2;
-    word-break: normal;
-    overflow-wrap: break-word;
+    word-break: keep-all; /* Respect user's wish for space-based breaking */
+    overflow-wrap: break-word; /* Still allow breaking for long words */
     color: #2c3e50;
 }
 
@@ -384,6 +384,14 @@ main {
         min-width: 100%;
         position: static;
         padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center header content */
+    }
+
+    header .controls {
+        width: 100%;
+        max-width: 500px; /* Prevent controls from being too wide on tablets */
     }
 
     h1 {
@@ -392,20 +400,25 @@ main {
     }
 
     .puzzle-board, .pieces-pool {
-        grid-template-columns: repeat(4, 1fr); /* Force 4 columns */
-        padding: 0.5rem;
-        gap: 0.4rem;
+        /* Use auto-fill to fill the space instead of forcing 4 columns */
+        grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width, 100px), 1fr));
+        padding: 1rem;
+        gap: 0.8rem;
     }
 
-    .piece {
-        word-break: normal; /* Use normal and overflow-wrap for better behavior */
-        overflow-wrap: anywhere;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.1;
-        padding: 0.2rem !important; /* Force smaller padding */
+    /* Small Phone optimization */
+    @media (max-width: 600px) {
+        .puzzle-board, .pieces-pool {
+            grid-template-columns: repeat(4, 1fr); /* Force 4 columns only on phones */
+            padding: 0.5rem;
+            gap: 0.4rem;
+        }
+
+        .piece {
+            word-break: normal;
+            overflow-wrap: anywhere;
+            padding: 0.2rem !important;
+        }
     }
 
     .modal-content {
