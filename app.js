@@ -310,6 +310,7 @@ function renderPieces() {
         piece.classList.add('piece');
         piece.draggable = true;
         piece.dataset.chapter = item.chapter;
+        piece.dataset.placed = "false";
         // Store summary as data attribute only (not displayed on piece)
         if (item.summary) piece.dataset.summary = item.summary;
         piece.textContent = item.title;
@@ -331,6 +332,10 @@ function renderPieces() {
 let draggedPiece = null;
 
 function dragStart(e) {
+    if (this.dataset.placed === "true") {
+        e.preventDefault();
+        return;
+    }
     draggedPiece = this;
     setTimeout(() => this.classList.add('dragging'), 0);
     e.dataTransfer.effectAllowed = 'move';
@@ -381,6 +386,7 @@ function drop(e) {
         
         // Remove draggable property from piece
         draggedPiece.draggable = false;
+        draggedPiece.dataset.placed = "true";
         
         placedPieces++;
         updateProgress();
@@ -403,8 +409,13 @@ let touchOffsetY = 0;
 let originalContainer = null;
 
 function touchStart(e) {
-    if (this.draggable === false) return;
+    if (this.dataset.placed === "true") return;
     e.preventDefault();
+    
+    // 아이패드/iOS 환경에서 draggable=true가 설정된 요소는 터치 시 네이티브 드래그를 
+    // 시도하면서 touchmove 이벤트를 무시하는 버그가 있습니다. 터치 시에는 draggable을 끕니다.
+    this.draggable = false;
+    
     touchTarget = this;
     originalContainer = this.parentNode;
     
@@ -459,6 +470,15 @@ function touchEnd(e) {
     if (!touchTarget) return;
     stopAutoScroll(); // Ensure scroll stops
     e.preventDefault();
+    
+    // document.elementFromPoint가 드래그 중인 요소를 피해서 아래에 있는 슬롯을 찾을 수 있도록 임시로 숨깁니다.
+    touchTarget.style.visibility = 'hidden';
+    
+    const touch = e.changedTouches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slot = elementBelow ? elementBelow.closest('.slot:not(.filled)') : null;
+    
+    touchTarget.style.visibility = '';
     touchTarget.style.position = '';
     touchTarget.style.zIndex = '';
     touchTarget.style.left = '';
@@ -466,10 +486,6 @@ function touchEnd(e) {
     touchTarget.style.width = '';
     touchTarget.style.height = '';
     touchTarget.classList.remove('dragging');
-    
-    const touch = e.changedTouches[0];
-    const elementsBelow = document.elementsFromPoint(touch.clientX, touch.clientY);
-    const slot = elementsBelow.find(el => el.classList.contains('slot') && !el.classList.contains('filled'));
     
     if (slot) {
         const slotChapter = slot.dataset.chapter;
@@ -489,6 +505,7 @@ function touchEnd(e) {
             playSuccessSound();
             speakChapterTitle(touchTarget.textContent);
             touchTarget.draggable = false;
+            touchTarget.dataset.placed = "true";
             touchTarget.style.position = 'relative'; // reset
             
             placedPieces++;
@@ -498,6 +515,8 @@ function touchEnd(e) {
             playFailSound();
             wrongAttempts.add(parseInt(pieceChapter));
             originalContainer.appendChild(touchTarget);
+            touchTarget.draggable = true; // 풀로 돌아가면 마우스 유저를 위해 다시 활성화
+            
             const originalBg = slot.style.backgroundColor;
             slot.style.backgroundColor = '#f8d7da';
             setTimeout(() => {
@@ -506,6 +525,7 @@ function touchEnd(e) {
         }
     } else {
         originalContainer.appendChild(touchTarget);
+        touchTarget.draggable = true; // 풀로 돌아가면 마우스 유저를 위해 다시 활성화
     }
     
     touchTarget = null;
@@ -513,11 +533,27 @@ function touchEnd(e) {
 }
 
 // Sound Effects (Web Audio API)
-function playSuccessSound() {
+let audioCtx = null;
+function getAudioContext() {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
+        if (!AudioContext) return null;
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    } catch(e) {
+        return null;
+    }
+}
+
+function playSuccessSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gainNode = ctx.createGain();
         osc.type = 'sine';
@@ -552,9 +588,8 @@ function speakChapterTitle(titleText) {
 
 function playFailSound() {
     try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
+        const ctx = getAudioContext();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gainNode = ctx.createGain();
         osc.type = 'triangle';

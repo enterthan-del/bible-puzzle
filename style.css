@@ -201,6 +201,9 @@ main {
     overflow-wrap: break-word;
     width: 100%;
     color: #2c3e50;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 
